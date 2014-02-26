@@ -21,7 +21,7 @@ namespace Ingress\Cycle;
 
 if (!class_exists("Cycle")) {
 	
-	require("Checkpoint.class.php");
+	require("Ingress/Cycle/Checkpoint.class.php");
 
 	/**
 	 * The format in which all dates will be shown
