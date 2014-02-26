@@ -1,6 +1,6 @@
 <?php
 set_include_path(get_include_path() . PATH_SEPARATOR . dirname($_SERVER['SCRIPT_FILENAME']) . "/lib");
-require("Cycle.class.php");
+require("Ingress/Cycle/Cycle.class.php");
 
 if (!isset($_REQUEST['cycle'])) {
 	$cycle = \Ingress\Cycle\Cycle::getCurrentCycle();
