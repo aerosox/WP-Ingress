@@ -3,13 +3,13 @@ set_include_path(get_include_path() . PATH_SEPARATOR . dirname($_SERVER['SCRIPT_
 require("Cycle.class.php");
 
 if (!isset($_REQUEST['cycle'])) {
-	$cycle = Cycle::getCurrentCycle();
+	$cycle = \Ingress\Cycle\Cycle::getCurrentCycle();
 	$redir =  $_SERVER['PHP_SELF'] . "?cycle=" . $cycle->getName();
 	header("Location: " . $redir);
 }
 else {
 	$c = $_REQUEST['cycle'];
-	$cycle = Cycle::fromIdentifier($c);
+	$cycle = \Ingress\Cycle\Cycle::fromIdentifier($c);
 	$cycle->getNext();
 	$cycle->getPrevious();
 	
@@ -18,9 +18,9 @@ else {
 	echo "<br/>";
 	echo "future? " . ($cycle->isFuture() ? "yes" : "no");
 	ECHO "<br/>";
-	echo "start: " . $cycle->getStartTime()->format(DATE_FORMAT);
+	echo "start: " . $cycle->getStartTime()->format(CYCLE_DATE_FORMAT);
 	echo "<br/>";
-	echo "end: " . $cycle->getEndTime()->format(DATE_FORMAT);
+	echo "end: " . $cycle->getEndTime()->format(CYCLE_DATE_FORMAT);
 
 	echo "<h2>Checkpoints</h2>";
 	echo "<ul>";

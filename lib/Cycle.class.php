@@ -23,8 +23,6 @@ if (!class_exists("Cycle")) {
 	
 	require("Checkpoint.class.php");
 
-	$start = new DateTime("2014-01-07 19:00:00", new DateTimeZone("US/Pacific"));
-
 	/**
 	 * The format in which all dates will be shown
 	 */
@@ -50,6 +48,8 @@ if (!class_exists("Cycle")) {
 	 */
 	define ('TIMEZONE', "US/Pacific");
 
+	$start = new \DateTime("2014-01-07 19:00:00", new \DateTimeZone(TIMEZONE));
+
 	/**
 	 * Class representing a single "cycle" for regional MU scoring
 	 *
@@ -69,7 +69,7 @@ if (!class_exists("Cycle")) {
 		public static function getCurrentCycle() {
 			global $start;
 
-			$now = new DateTime("now", new DateTimeZone(TIMEZONE));
+			$now = new \DateTime("now", new \DateTimeZone(TIMEZONE));
 			$cycle_number = (int)(($now->getTimestamp() - $start->getTimestamp()) / CYCLE_LENGTH_SECONDS);
 			$temp = $cycle_number + 1; // +1 because the "first" cycle was 2014.2
 			$year = 2014 + ($temp > 12 ? (int)($temp / 12) : 0);
@@ -166,13 +166,13 @@ if (!class_exists("Cycle")) {
 			$this->startTime->setTimestamp($start->getTimestamp() + ($this->number * CYCLE_LENGTH_SECONDS));
 
 			$this->endTime = clone $this->startTime;
-			$this->endTime->add(new DateInterval("PT" . CYCLE_LENGTH_SECONDS . "S"));
+			$this->endTime->add(new \DateInterval("PT" . CYCLE_LENGTH_SECONDS . "S"));
 
 			$this->checkpoints = array();
 			$checkpoint = clone $this->startTime;
 
 			do {
-				$checkpoint->add(new DateInterval("PT5H")); // 5 hours
+				$checkpoint->add(new \DateInterval("PT5H")); // 5 hours
 				$this->checkpoint[] = new Checkpoint(clone $checkpoint);
 			}
 			while ($checkpoint < $this->endTime);
