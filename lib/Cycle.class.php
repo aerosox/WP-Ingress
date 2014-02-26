@@ -1,25 +1,61 @@
 <?php
-/*
+/**
+ * Copyright 2014 John Luetke
  *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * @license http://www.gnu.org/licenses/gpl-3.0.html GPLv3
  */
+namespace Ingress\Cycle;
+
 if (!class_exists("Cycle")) {
 	
-	require("./CycleCheckpoint.class.php");
+	require("Checkpoint.class.php");
 
 	$start = new DateTime("2014-01-07 19:00:00", new DateTimeZone("US/Pacific"));
 
-	define ('DATE_FORMAT', "Y-m-d H:i:s (l)");
-	define ('CHECKPOINT_DATE_FORMAT', "D, M j H:i");
-	define ('CHECKPOINT_LENGTH_SECONDS', 18000);
+	/**
+	 * The format in which all dates will be shown
+	 */
+	define ('CYCLE_DATE_FORMAT', "Y-m-d H:i:s (l)");
+
+	/**
+	 * The number of Checkpoints per cycle
+	 */
 	define ('CHECKPOINTS_PER_CYCLE', 35);
+
+	/**
+	 * The length of a Cycle, in seconds
+	 */
 	define ('CYCLE_LENGTH_SECONDS', 630000);
+	
+	/**
+	 * The number of cycles per calendar year. (365 * 24) / 175
+	 */
 	define ('CYCLES_PER_YEAR', 50);
+
+	/**
+	 * Timezone for all DateTime instances.
+	 */
 	define ('TIMEZONE', "US/Pacific");
 
 	/**
 	 * Class representing a single "cycle" for regional MU scoring
 	 *
 	 * @author John Luetke <john@johnluetke.net>
+	 *
+	 * @package Ingress\Checkpoint
 	 */
 	class Cycle {
 	
@@ -63,7 +99,9 @@ if (!class_exists("Cycle")) {
 		}
 
 		/**
-		 * Determins if the given cycle identifier is valid
+		 * Determines if the given cycle identifier is valid
+		 *
+		 * An example of an invalid cycle would be anything prior to 2014.2, since that was the "first" one.
 		 *
 		 * @param string $cycle the cycle identifier
 		 *
@@ -76,15 +114,44 @@ if (!class_exists("Cycle")) {
 			return !($cycle < 1) && ($year >= 2014) && !($year == 2014 && $cycle == 1) ;
 		}
 
+		/**
+		 * @ignore
+		 */
 		private $name;
+
+		/**
+		 * @ignore
+		 */
 		private $year;
+
+		/**
+		 * @ignore
+		 */
 		private $number;
+
+		/**
+		 * @ignore
+		 */
 		private $startTime;
+
+		/**
+		 * @ignore
+		 */
 		private $endTime;
 
+		/**
+		 * @ignore
+		 */
 		private $next;
+
+		/**
+		 * @ignore
+		 */
 		private $previous;
 
+		/**
+		 * @ignore
+		 */
 		private function __construct($year, $cycle) {
 			global $start;
 	
@@ -106,11 +173,19 @@ if (!class_exists("Cycle")) {
 
 			do {
 				$checkpoint->add(new DateInterval("PT5H")); // 5 hours
-				$this->checkpoint[] = new CycleCheckpoint(clone $checkpoint);
+				$this->checkpoint[] = new Checkpoint(clone $checkpoint);
 			}
 			while ($checkpoint < $this->endTime);
 		}
 
+		/**
+		 * Gets the Cycle that sequentially follows this Cycle
+		 *
+		 * @return \Ingress\Cycle\Cycle|null The following Cycle, or null if there is not one
+		 *
+		 * @api
+		 * @since 0.1.0
+		 */
 		public function getNext() {
 			if ($this->next == null) {
 				$nextCycle = $this->cycle + 1;
@@ -126,6 +201,14 @@ if (!class_exists("Cycle")) {
 			return $this->next;
 		}
 
+		/**
+		 * Gets the Cycle that sequentially preceeds this Cycle
+		 *
+		 * @return \Ingress\Cycle\Cycle|null The following Cycle, or null if there is not one
+		 *
+		 * @api
+		 * @since 0.1.0
+		 */
 		public function getPrevious() {
 			if ($this->previous == null) {
 				$previousCycle = $this->cycle - 1;
@@ -149,16 +232,16 @@ if (!class_exists("Cycle")) {
 		/**
 		 * Determines if this is a valid cycle.
 		 *
-		 * An example of an invalid cycle would be anything prior to 2014.2, since that was the "first" one.
-		 *
 		 * @return boolean true if valid, false otherwise
+		 *
+		 * @see Cycle::isValidIdentifier() Cycle::isValidIdentifier()
 		 */
 		public function isValid() {
 			return Cycle::isValidIdentifier($this->name);
 		}
 
 		/**
-		 * Determins if this cycle is the present one
+		 * Determines if this cycle is the present one, relative to the current time.
 		 *
 		 * @return boolean true if this is the present cycle, false otherwise
 		 */
@@ -168,7 +251,7 @@ if (!class_exists("Cycle")) {
 		}
 
 		/**
-		 * Determines if this cycle is a future one
+		 * Determines if this cycle is a future one, relative to the current time.
 		 *
 		 * @return boolean true if a future cycle, false otherwise
 		 */
@@ -176,18 +259,45 @@ if (!class_exists("Cycle")) {
 			return $this->startTime->getTimestamp() > time();
 		}
 
+		/**
+		 * Gets the name of this Cycle. For example, 2014.2
+		 *
+		 * @return string the name of this Cycle
+		 */
 		public function getName() {
 			return $this->name;
 		}
 
+		/**
+		 * Gets the start DateTime for this Cycle
+		 *
+		 * @return \DateTime the DateTime representing the start of this Cycle
+		 *
+		 * @see http://www.php.net/manual/en/class.datetime.php DateTime
+		 */
 		public function getStartTime() {
 			return $this->startTime;
 		}
 
+		/**
+		 * Gets the end DateTime for this Cycle
+		 *
+		 * @return \DateTime the DateTime representing the end of this Cycle
+		 *
+		 * @see http://www.php.net/manual/en/class.datetime.php DateTime 
+		 */
 		public function getEndTime() {
 			return $this->endTime;
 		}
 
+		/**
+		 * Gets all Checkpoints in this Cycle
+		 *
+		 * @return array Array of Checkpoints for this Cycle
+		 *
+		 * @see \Ingress\Cycle\Checkpoint Checkpoint
+		 * @uses \Ingress\Cycle\Checkpoint to emulate DateTimes
+		 */
 		public function getCheckpoints() {
 			return $this->checkpoint;
 		}
