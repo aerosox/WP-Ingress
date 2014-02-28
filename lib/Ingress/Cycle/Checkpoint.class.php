@@ -83,7 +83,7 @@ if (!class_exists("Checkpoint")) {
 		 */
 		public function isNext() {
 			$now = time();
-			return ($this->datetime->getTimestamp() - CYCLE_LENGTH_SECONDS) < $now && $this->datetime->getTimestamp() >= $now;
+			return ($this->datetime->getTimestamp() - CHECKPOINT_LENGTH_SECONDS) < $now && $this->datetime->getTimestamp() >= $now;
 		}
 
 		/**
