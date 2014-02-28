@@ -226,7 +226,7 @@ if (!class_exists("Cycle")) {
 				}
 			}
 			
-			return $this->next;
+			return $this->previous;
 		}
 
 		/**
@@ -249,6 +249,16 @@ if (!class_exists("Cycle")) {
 			$now = time();
 			return $this->startTime->getTimestamp() <= $now && $this->endTime->getTimestamp() >= $now;
 		}
+
+		/**
+		 * Determines if this cycle is a past one, relative to the current time.
+		 *
+		 * @return boolean true if a past cycle, false otherwise
+		 */
+		public function isPast() {
+			return $this->endTime->getTimestamp() < time();
+		}
+
 
 		/**
 		 * Determines if this cycle is a future one, relative to the current time.
