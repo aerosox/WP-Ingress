@@ -1,0 +1,16 @@
+.ingress-cycle .cycle-meta { display: none; }
+
+.ingress-cycle .cycle-navigation { text-align: center; }
+.ingress-cycle .cycle-navigation * { display: inline-block; }
+.ingress-cycle .cycle-navigation .previous-cycle { margin-right: 15px; }
+.ingress-cycle .cycle-navigation .next-cycle { margin-left: 15px; }
+
+.ingress-cycle .cycle-checkpoints li.checkpoint { margin-left: 20px; }
+
+.ingress-cycle.current-cycle li.checkpoint.has-passed {
+	color: #DDD;
+}
+
+.ingress-cycle.current-cycle li.checkpoint.next-checkpoint {
+	color: #004600;
+}
